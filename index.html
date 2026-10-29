@@ -273,8 +273,7 @@ button,input{font-family:inherit;color:inherit}
     </div>
     <div style="margin-top:24px">
       <button type="button" class="btn btn-primary" id="pdf-save"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4F24A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v3h16v-3M12 4v11M7 10l5 5 5-5"></path></svg>결과 카드 저장</button>
-      <p class="status" id="pdf-status" aria-live="polite"></p>
-      <p class="fineprint" style="margin:2px 0 0">가로형 PDF 2쪽(결과 · 문항별 점수)으로 저장돼요.</p>
+      <p class="status" id="pdf-status" aria-live="polite" hidden></p>
       <button type="button" class="link-btn" data-go="types" style="display:block;margin:10px auto 0">다른 유형도 궁금하다면</button>
     </div>
   </section>
@@ -679,7 +678,7 @@ button,input{font-family:inherit;color:inherit}
       '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 14px;margin-top:10px;flex-grow:1">' + blocks + '</div>' +
       '<div class="pdf-foot" style="margin-top:8px"><span>유형별 합계는 각 유형 9문항 점수의 합이에요.</span><span>2 / 2</span></div></div>';
   }
-  function setStatus(msg, isErr){ var s = $('pdf-status'); s.textContent = msg; s.className = 'status' + (isErr ? ' err' : ''); }
+  function setStatus(msg, isErr){ var s = $('pdf-status'); s.textContent = isErr ? msg : ''; s.className = 'status' + (isErr ? ' err' : ''); s.hidden = !isErr; }
 
   var busy = false;
   async function buildPdfBlob(){
