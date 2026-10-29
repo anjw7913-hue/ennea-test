@@ -366,14 +366,24 @@ button,input{font-family:inherit;color:inherit}
     {s: 40, c: '#5B3DF5', label: '매우 그렇다 (5점)'}
   ];
 
-  /* 한 유형 문항이 몰리지 않게 1~9번을 번갈아 배치 (총 90문항) */
-  var QS = [];
-  for (var i = 0; i < 10; i++) {
-    for (var t = 1; t <= 9; t++) {
-      var it = BANK[t][i];
-      QS.push(typeof it === 'string' ? {type: t, text: it, note: '', x: false} : {type: t, text: it.t, note: it.n || '', x: !!it.x});
+  /* 문항 배치 (총 90문항) */
+  var QS = (function(){
+    var main = [], extra = [];
+    for (var i = 0; i < 10; i++) {
+      for (var t = 1; t <= 9; t++) {
+        var it = BANK[t][i];
+        var q = typeof it === 'string' ? {type: t, text: it, note: '', x: false} : {type: t, text: it.t, note: it.n || '', x: !!it.x};
+        (q.x ? extra : main).push(q);
+      }
     }
-  }
+    var order = [3, 7, 1, 9, 5, 2, 8, 4, 6];
+    var slot = [2, 0, 3, 1, 4, 2, 0, 3, 1];
+    var at = {};
+    order.forEach(function(t, k){ at[(2 * k + 1) * 5 + slot[k]] = extra.filter(function(q){ return q.type === t; })[0]; });
+    var out = [], m = 0;
+    for (var n = 0; n < main.length + extra.length; n++) out.push(at[n] || main[m++]);
+    return out;
+  })();
   var PER = 5, PAGES = Math.ceil(QS.length / PER);
 
   var state = {
