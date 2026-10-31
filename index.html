@@ -216,7 +216,7 @@ button,input{font-family:inherit;color:inherit}
       <div class="bar" role="progressbar" aria-label="진행률" aria-valuemin="0" aria-valuemax="100" id="quiz-bar"><i></i></div>
       <div class="pct" id="quiz-pct">0%</div>
     </div>
-    <div style="margin-top:22px"><span class="sticker" id="quiz-part">PART 1 / 18</span></div>
+    <div style="margin-top:22px"><span class="sticker" id="quiz-part">PART 1 / 9</span></div>
     <p class="sub" style="font-size:13px;margin-top:12px">지금의 나를 솔직하게 골라주세요. 가운데(보통)를 많이 고르면 유형을 찾기 어려워요.</p>
     <div class="qcard" id="quiz-list"></div>
     <div class="grow" style="min-height:24px"></div>
@@ -361,7 +361,7 @@ button,input{font-family:inherit;color:inherit}
     for (var n = 0; n < main.length + extra.length; n++) out.push(at[n] || main[m++]);
     return out;
   })();
-  var PER = 5, PAGES = Math.ceil(QS.length / PER);
+  var PER = 10, PAGES = Math.ceil(QS.length / PER);
 
   var state = {
     screen: 'intro', from: 'intro',
