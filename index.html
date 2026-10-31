@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ennea 에니어그램 테스트</title>
+<title>차세대 메타인지 테스트</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
 /* Layout: 한 손 모바일 앱 — 가운데 440px 컬럼, 화면별 섹션 전환 / PDF는 화면 밖 A4 가로 2장 */
@@ -27,7 +27,7 @@ button,input{font-family:inherit;color:inherit}
 .app{max-width:440px;margin:0 auto;min-height:100%;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-block:16px 32px}
 .screen{display:flex;flex-direction:column;min-height:calc(100dvh - 48px)}
 .topbar{display:flex;align-items:center;gap:12px;height:44px}
-.logo{font-family:var(--f-display);font-size:24px;letter-spacing:-.5px}
+.logo{font-family:var(--f-display);font-size:21px;letter-spacing:-.5px}
 .logo span{color:var(--violet)}
 .icon-btn{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;border-radius:14px;background:var(--surface);border:1.5px solid var(--line);padding:0;cursor:pointer}
 .grow{flex-grow:1}
@@ -127,7 +127,7 @@ button,input{font-family:inherit;color:inherit}
 
   <!-- 1. 시작 -->
   <section id="s-intro" class="screen" aria-labelledby="intro-title">
-    <div class="topbar"><div class="logo">ennea<span>.</span></div></div>
+    <div class="topbar"><div class="logo">차세대 메타인지 테스트</div></div>
     <div class="hero">
       <svg viewBox="0 0 300 300" role="img" aria-label="Z 글자 모양의 보라색 캐릭터">
       <g font-family="Black Han Sans, sans-serif" font-size="15" text-anchor="middle">
@@ -574,7 +574,7 @@ button,input{font-family:inherit;color:inherit}
   function fmtDate(d, sep){ return d.getFullYear() + sep + String(d.getMonth() + 1).padStart(2, '0') + sep + String(d.getDate()).padStart(2, '0'); }
   function headHtml(title){
     return '<div class="pdf-head"><div style="display:flex;align-items:baseline;gap:14px">' +
-      '<div style="font-family:var(--f-display);font-size:26px">ennea<span style="color:#5B3DF5">.</span></div>' +
+      '<div style="font-family:var(--f-display);font-size:22px">차세대 메타인지 테스트</div>' +
       '<div style="font-size:18px;font-weight:900">' + title + '</div></div>' +
       '<div style="display:flex;gap:18px;font-size:13px;color:#3B3846">' +
       '<span><b>이름</b> ' + esc(state.name.trim()) + '</span>' +
@@ -697,7 +697,7 @@ button,input{font-family:inherit;color:inherit}
       if (!window.jspdf || !window.html2canvas) { setStatus('PDF 도구를 불러오지 못했어요. 인터넷 연결을 확인하고 다시 눌러주세요.', true); return; }
       var blob = await buildPdfBlob();
       var safe = state.name.trim().replace(/[\\/:*?"<>|\s]+/g, '') || '참여자';
-      var filename = '에니어그램결과_' + safe + '_' + fmtDate(state.testedAt, '') + '.pdf';
+      var filename = '메타인지테스트결과_' + safe + '_' + fmtDate(state.testedAt, '') + '.pdf';
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
