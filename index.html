@@ -4,8 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>차세대 메타인지 테스트</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<meta name="theme-color" content="#F4F1EA">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="메타인지 테스트">
+<link rel="preload" href="fonts/noto-sans-kr.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/black-han-sans.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:'Noto Sans KR';src:url(fonts/noto-sans-kr.woff2) format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Black Han Sans';src:url(fonts/black-han-sans.woff2) format('woff2');font-weight:400;font-style:normal;font-display:swap}
 /* Layout: 한 손 모바일 앱 — 가운데 440px 컬럼, 화면별 섹션 전환 / PDF는 화면 밖 A4 가로 2장 */
 :root{
   --paper:#F4F1EA; --surface:#FFFFFF; --ink:#16141C; --muted:#5E5A6B; --line:#DCD6CA; --track:#E2DCCF;
@@ -263,6 +273,7 @@ button,input{font-family:inherit;color:inherit}
           <p class="lead">검사가 잘 접수됐어요. 신청해 주신 분들께는 결과를 하나하나 풀어서 따로 알려드릴게요.</p>
           <button type="button" class="btn btn-primary" id="pdf-save"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4F24A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16v3h16v-3M12 4v11M7 10l5 5 5-5"></path></svg>결과 카드 저장</button>
           <p class="status" id="pdf-status" aria-live="polite" hidden></p>
+          <button type="button" class="link-btn" id="restart" style="display:block;margin:8px auto 0">처음으로</button>
         </div>
       </div>
     </div>
@@ -284,8 +295,8 @@ button,input{font-family:inherit;color:inherit}
 
 <div id="pdf-stage" aria-hidden="true"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="vendor/html2canvas.min.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
 <script>
 (function(){
   'use strict';
@@ -689,12 +700,13 @@ button,input{font-family:inherit;color:inherit}
   var busy = false;
   async function buildPdfBlob(){
     var stage = $('pdf-stage');
-    stage.innerHTML = page1Html() + page2Html() + page3Html();
-    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
-    var pages = stage.querySelectorAll('.pdf-page');
+    var htmls = [page1Html(), page2Html(), page3Html()];
     var pdf = new window.jspdf.jsPDF({orientation: 'landscape', unit: 'mm', format: 'a4', compress: true});
-    for (var i = 0; i < pages.length; i++) {
-      var canvas = await window.html2canvas(pages[i], {scale: 2, backgroundColor: '#FBFAF6', logging: false, width: 1123, height: 794, windowWidth: 1123});
+    // 한 쪽씩 화면 밖에 그려서 이미지로 바꿈 (여러 쪽을 한 번에 그리면 아래쪽 글자 간격이 틀어짐)
+    for (var i = 0; i < htmls.length; i++) {
+      stage.innerHTML = htmls[i];
+      try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+      var canvas = await window.html2canvas(stage.firstElementChild, {scale: 2, backgroundColor: '#FBFAF6', logging: false, width: 1123, height: 794, windowWidth: 1123});
       if (i > 0) pdf.addPage('a4', 'landscape');
       pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
     }
@@ -706,13 +718,14 @@ button,input{font-family:inherit;color:inherit}
     busy = true; $('pdf-save').disabled = true;
     setStatus('PDF를 만들고 있어요…', false);
     try {
-      if (!window.jspdf || !window.html2canvas) { setStatus('PDF 도구를 불러오지 못했어요. 인터넷 연결을 확인하고 다시 눌러주세요.', true); return; }
+      if (!window.jspdf || !window.html2canvas) { setStatus('PDF 도구를 불러오지 못했어요. 페이지를 새로고침한 뒤 다시 눌러주세요.', true); return; }
       var blob = await buildPdfBlob();
       var safe = state.name.trim().replace(/[\\/:*?"<>|\s]+/g, '') || '참여자';
       var filename = '메타인지테스트결과_' + safe + '_' + fmtDate(state.testedAt, '') + '.pdf';
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
-      a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+      a.href = url; a.download = filename; a.rel = 'noopener'; a.style.display = 'none'; document.body.appendChild(a); a.click();
+      setTimeout(function(){ a.remove(); }, 1000);
       setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
       setStatus('PDF를 저장했어요. 다운로드 폴더를 확인해 주세요.', false);
     } catch (e) {
@@ -723,6 +736,25 @@ button,input{font-family:inherit;color:inherit}
     }
   }
   $('pdf-save').addEventListener('click', savePdf);
+
+  /* ---------- 처음으로 (응답 초기화) ---------- */
+  function resetAll(){
+    state.name = ''; state.gender = ''; state.year = ''; state.page = 0; state.from = 'intro';
+    state.answers = QS.map(function(){ return null; });
+    state.result = null; state.testedAt = null; state.pdfAutoDone = false;
+    $('pf-name').value = ''; $('pf-year').value = '';
+    document.querySelectorAll('[data-gender]').forEach(function(x){ x.setAttribute('aria-checked', 'false'); });
+    $('pf-year-alert').hidden = true;
+    setStatus('', false);
+    checkProfile();
+    show('intro');
+  }
+  $('restart').addEventListener('click', resetAll);
+
+  /* ---------- 오프라인 지원: 첫 접속 때 필요한 파일을 기기에 저장 ---------- */
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
 
   checkProfile();
 })();
